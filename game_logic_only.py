@@ -1,8 +1,8 @@
 import os
 import random
+
 from colorama import init, Fore, Style
-import RPi.GPIO as GPIO
-import time
+
 
 init(autoreset=True)
 
@@ -70,17 +70,8 @@ max_attempts = 5
 
 def main():
 
-    SOLENOID_PIN = 17
-    DOOR_SENSOR_PIN = 18
-
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(SOLENOID_PIN, GPIO.OUT)
-    GPIO.setup(DOOR_SENSOR_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-
-    GPIO.output(SOLENOID_PIN, GPIO.LOW)
 
     while True:
-        os.system('cls' if os.name == 'nt' else 'clear')
         correct_pin = generate_pin()
         print(Fore.GREEN + "===========================")
         print(Fore.GREEN + "Welcome to the Box PIN Game!")
@@ -91,15 +82,9 @@ def main():
         win_or_lose = False
         quit_game = False
         while attempt != 6:
-            if GPIO.input(DOOR_SENSOR_PIN) == GPIO.HIGH:
-                time.sleep(7)
-                if GPIO.input(DOOR_SENSOR_PIN) == GPIO.HIGH:
-                    print("Door is not closed")
-                continue
             print("\n" + Fore.CYAN + "Attempt #{}".format(attempt))
             user_input = input("Enter a 5-digit PIN: ")
             if user_input == "quit":
-                GPIO.cleanup()
                 quit_game = True
                 break
 
@@ -123,17 +108,6 @@ def main():
                 print(Fore.GREEN + "Congratulations! You entered the correct PIN.")
                 print()
                 print(Fore.GREEN + "===========================================")
-                GPIO.output(SOLENOID_PIN, GPIO.HIGH)
-                time.sleep(0.3)
-                door_open = False
-                while door_open == False:
-                    if GPIO.input(DOOR_SENSOR_PIN) != GPIO.HIGH:
-                        GPIO.output(SOLENOID_PIN, GPIO.HIGH)
-                        continue
-
-                    if GPIO.input(DOOR_SENSOR_PIN) == GPIO.HIGH:
-                        door_open = True
-                        GPIO.output(SOLENOID_PIN, GPIO.LOW)
                 win_or_lose = True
 
                 print()
